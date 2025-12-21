@@ -10,11 +10,12 @@ from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.retrievers import BM25Retriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
 
-# ----------------- SESSION STATE (SAFE INIT) -----------------
+# ----------------- SESSION STATE -----------------
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
@@ -60,12 +61,10 @@ with st.sidebar:
 if pdf_dosyasi:
     pdf_hash = get_pdf_hash(pdf_dosyasi)
 
-    # PDF değiştiyse sohbeti sıfırla
     if pdf_hash != st.session_state.last_pdf_hash:
         st.session_state.chat_history = []
         st.session_state.last_pdf_hash = pdf_hash
 
-    # PDF OKU
     reader = PdfReader(pdf_dosyasi)
     text = "".join(page.extract_text() or "" for page in reader.pages)
 
@@ -75,7 +74,8 @@ if pdf_dosyasi:
 
     st.success(f"✅ PDF yüklendi ({len(text)} karakter)")
 
-    # SPLIT
+
+    # -------- SPLIT --------
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200
@@ -84,7 +84,8 @@ if pdf_dosyasi:
 
     embeddings = load_embeddings()
 
-    # FAISS CACHE
+
+    # -------- FAISS CACHE --------
     cache_dir = Path("faiss_cache")
     cache_dir.mkdir(exist_ok=True)
     faiss_path = cache_dir / pdf_hash
@@ -99,28 +100,47 @@ if pdf_dosyasi:
         vectorstore = FAISS.from_texts(chunks, embeddings)
         vectorstore.save_local(faiss_path)
 
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+
+    # -------- RETRIEVERS --------
+    faiss_retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+
+    bm25_retriever = BM25Retriever.from_texts(chunks)
+    bm25_retriever.k = 4
 
 
-    # ----------------- CHAT HISTORY UI -----------------
+    # -------- HYBRID RETRIEVE (DOĞRU API) --------
+    def hybrid_retrieve(query: str):
+        docs_faiss = faiss_retriever.invoke(query)
+        docs_bm25 = bm25_retriever.invoke(query)
+
+        seen = set()
+        unique_docs = []
+
+        for doc in docs_faiss + docs_bm25:
+            content = doc.page_content.strip()
+            if content not in seen:
+                unique_docs.append(doc)
+                seen.add(content)
+
+        return unique_docs[:5]
+
+
+    # -------- CHAT HISTORY UI --------
     for role, msg in st.session_state.chat_history:
         with st.chat_message(role):
             st.markdown(msg)
 
 
-    # ----------------- CHAT INPUT -----------------
+    # -------- CHAT INPUT --------
     soru = st.chat_input("PDF hakkında bir soru sor...")
 
     if soru:
-        # USER MESSAGE
         st.session_state.chat_history.append(("user", soru))
         with st.chat_message("user"):
             st.markdown(soru)
 
-        # 🔐 STREAM-SAFE SNAPSHOT
         chat_history_snapshot = st.session_state.chat_history.copy()
 
-        # ASSISTANT (STREAMING)
         with st.chat_message("assistant"):
             placeholder = st.empty()
             full_answer = ""
@@ -153,7 +173,7 @@ Kurallar:
 
             chain = (
                 {
-                    "context": retriever,
+                    "context": lambda q: hybrid_retrieve(q),
                     "question": RunnablePassthrough(),
                     "chat_history": lambda _: "\n".join(
                         f"{r}: {m}"
@@ -169,5 +189,4 @@ Kurallar:
                     full_answer += chunk.content
                     placeholder.markdown(full_answer)
 
-        # ASSISTANT MESSAGE SAVE
         st.session_state.chat_history.append(("assistant", full_answer))
