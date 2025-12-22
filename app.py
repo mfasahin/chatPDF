@@ -35,6 +35,25 @@ def load_embeddings():
     )
 
 
+def question_profile(question: str):
+    q = question.lower()
+    word_count = len(q.split())
+
+    semantic_keywords = [
+        "neden", "nasıl", "açıkla", "yorumla",
+        "avantaj", "dezavantaj", "etki", "önem"
+    ]
+
+    keyword_hits = sum(1 for k in semantic_keywords if k in q)
+
+    if word_count <= 6 and keyword_hits == 0:
+        return "keyword"
+    elif keyword_hits >= 1 or word_count >= 10:
+        return "semantic"
+    else:
+        return "balanced"
+
+
 # ----------------- PAGE -----------------
 st.set_page_config(page_title="PDF Asistanı", page_icon="🤖")
 st.header("🤖 PDF Dosyanla Sohbet Et")
@@ -103,26 +122,43 @@ if pdf_dosyasi:
 
     # -------- RETRIEVERS --------
     faiss_retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
-
     bm25_retriever = BM25Retriever.from_texts(chunks)
     bm25_retriever.k = 4
 
 
-    # -------- HYBRID RETRIEVE (DOĞRU API) --------
-    def hybrid_retrieve(query: str):
+    # -------- SMART HYBRID RETRIEVE --------
+    def hybrid_retrieve(query: str, k=5):
+        profile = question_profile(query)
+
+        if profile == "keyword":
+            w_bm25, w_faiss = 0.6, 0.4
+        elif profile == "semantic":
+            w_bm25, w_faiss = 0.3, 0.7
+        else:
+            w_bm25, w_faiss = 0.5, 0.5
+
         docs_faiss = faiss_retriever.invoke(query)
         docs_bm25 = bm25_retriever.invoke(query)
 
-        seen = set()
-        unique_docs = []
+        scored = {}
 
-        for doc in docs_faiss + docs_bm25:
-            content = doc.page_content.strip()
-            if content not in seen:
-                unique_docs.append(doc)
-                seen.add(content)
+        for rank, doc in enumerate(docs_faiss):
+            scored[doc.page_content] = scored.get(
+                doc.page_content, 0
+            ) + (len(docs_faiss) - rank) * w_faiss
 
-        return unique_docs[:5]
+        for rank, doc in enumerate(docs_bm25):
+            scored[doc.page_content] = scored.get(
+                doc.page_content, 0
+            ) + (len(docs_bm25) - rank) * w_bm25
+
+        sorted_chunks = sorted(
+            scored.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        return "\n\n".join(text for text, _ in sorted_chunks[:k])
 
 
     # -------- CHAT HISTORY UI --------
