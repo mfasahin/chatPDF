@@ -15,15 +15,15 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
 
-# ----------------- CSS -----------------
-def load_css(path: str):
-    with open(path, "r", encoding="utf-8") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
 # ----------------- PAGE -----------------
 st.set_page_config(page_title="PDF Asistanı", page_icon="🤖")
-load_css("styles/chat.css")
+
+# CSS
+st.markdown(
+    "<style>" + open("styles/chat.css", encoding="utf-8").read() + "</style>",
+    unsafe_allow_html=True
+)
+
 st.header("🤖 PDF Dosyanla Sohbet Et")
 
 
@@ -168,41 +168,30 @@ if pdf_dosyasi:
 
         chat_snapshot = st.session_state.chat_history[-6:]
 
-        # 🔹 STATUS (assistant mesajı başlamadan önce)
-        status_placeholder = st.empty()
-        status_placeholder.info("🤖 Asistan düşünüyor...")
-
-        # 🔹 RETRIEVE
         context_text = hybrid_retrieve(soru)
 
-        # 🔹 LLM
         llm = ChatGroq(
             model_name="llama-3.3-70b-versatile",
             groq_api_key=api_key,
             temperature=0.2,
-            max_tokens=900,
-            streaming=True
+            max_tokens=700,
+            streaming=True,
+            timeout=60
         )
 
-        # 🔹 PROMPT
         prompt = ChatPromptTemplate.from_template("""
-    Sadece PDF içeriğine dayanarak cevap ver.
+Sadece PDF içeriğine dayanarak cevap ver.
 
-    SOHBET:
-    {chat_history}
+SOHBET:
+{chat_history}
 
-    PDF BAĞLAMI:
-    {context}
+PDF BAĞLAMI:
+{context}
 
-    SORU:
-    {question}
+SORU:
+{question}
+""")
 
-    Kurallar:
-    - PDF'te yoksa: "Bu dokümanda buna dair bilgi yok." de
-    - Net, akademik ve tutarlı ol
-    """)
-
-        # 🔹 CHAIN
         chain = (
             {
                 "context": lambda _: context_text,
@@ -215,21 +204,36 @@ if pdf_dosyasi:
             | llm
         )
 
-        # 🔹 ASSISTANT MESAJI
+        # -------- ASSISTANT --------
         with st.chat_message("assistant"):
-            placeholder = st.empty()
+            thinking = st.markdown(
+                """
+                <div class="assistant-thinking">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="thinking-text">Asistan düşünüyor</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            answer_box = st.empty()
             full_answer = ""
-            status_cleared = False
+            cleared = False
 
-            for chunk in chain.stream(soru):
-                if hasattr(chunk, "content") and chunk.content:
+            try:
+                for chunk in chain.stream(soru):
+                    if hasattr(chunk, "content") and chunk.content:
+                        if not cleared:
+                            thinking.empty()
+                            cleared = True
 
-                    # ✅ İlk token geldi → status sil
-                    if not status_cleared:
-                        status_placeholder.empty()
-                        status_cleared = True
+                        full_answer += chunk.content
+                        answer_box.markdown(full_answer)
 
-                    full_answer += chunk.content
-                    placeholder.markdown(full_answer)
+            except Exception:
+                thinking.empty()
+                st.error("⚠️ Bağlantı hatası oluştu. Lütfen tekrar deneyin.")
 
         st.session_state.chat_history.append(("assistant", full_answer))
