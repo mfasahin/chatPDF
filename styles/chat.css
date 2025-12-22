@@ -1,0 +1,30 @@
+/* Genel font ve görünüm */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Chat mesajları */
+[data-testid="stChatMessage"] {
+    padding: 1.1rem;
+    border-radius: 14px;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* Kullanıcı mesajı */
+[data-testid="stChatMessage"][aria-label="user"] {
+    background: linear-gradient(135deg, #ff4b4b, #ff7676);
+    color: white;
+}
+
+/* Asistan mesajı */
+[data-testid="stChatMessage"][aria-label="assistant"] {
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+}
+
+/* Loading / status */
+[data-testid="stStatus"] {
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+}
