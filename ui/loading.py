@@ -2,7 +2,8 @@ import streamlit as st
 
 
 def show_loading(message="PDF hazırlanıyor..."):
-    return st.markdown(
+    """Modern loading overlay gösterir"""
+    st.markdown(
         f"""
         <div class="loading-overlay">
             <div class="loading-box">

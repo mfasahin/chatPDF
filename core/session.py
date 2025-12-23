@@ -18,8 +18,15 @@ def init_session():
 
 def reset_chat_on_new_pdf(pdf_hash: str):
     """
-    Yeni PDF yüklendiğinde sohbet geçmişini sıfırlar
+    Yeni PDF yüklendiğinde sohbet geçmişini sıfırlar ve açılış mesajını ekler
     """
     if st.session_state.last_pdf_hash != pdf_hash:
-        st.session_state.chat_history.clear()
+        # Eski yöntem: st.session_state.chat_history.clear()
+        
+        # YENİ YÖNTEM: Listeyi boşaltmak yerine ilk mesajı ekliyoruz
+        # Tuple yapısı: (Rol, Mesaj) -> ("assistant", "Merhaba...")
+        st.session_state.chat_history = [
+            ("assistant", "PDF dosyanı başarıyla analiz ettim. İçeriğiyle ilgili merak ettiğin her şeyi sorabilirsin.")
+        ]
+        
         st.session_state.last_pdf_hash = pdf_hash

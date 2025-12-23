@@ -1,139 +1,368 @@
 /* =========================
-   APP
+   GLOBAL & FONTS
 ========================= */
-.stApp {
-    background: radial-gradient(circle at top, #151a22, #0b0f14);
-    color: #e6e6e6;
-    font-family: 'Inter', sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* =========================
-   STREAMLIT DEFAULT STATUS
+   APP BACKGROUND
 ========================= */
-/* "Running get_embeddings()" vb. yazıları gizle */
-[data-testid="stStatus"] {
+.stApp {
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    background-attachment: fixed;
+    color: #e8e8e8;
+}
+
+/* Dark overlay for depth */
+.stApp::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(74, 144, 226, 0.1), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* =========================
+   HIDE STREAMLIT DEFAULTS
+========================= */
+[data-testid="stStatus"],
+[data-testid="stStatusWidget"],
+.stDeployButton,
+#MainMenu,
+footer {
     display: none !important;
 }
 
+/* Header spacing */
+.stApp > header {
+    background-color: transparent;
+}
+
 /* =========================
-   CHAT MESSAGE
+   MAIN CONTAINER
+========================= */
+.main .block-container {
+    max-width: 900px;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+/* =========================
+   HEADER
+========================= */
+h1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 2rem;
+}
+
+/* =========================
+   CHAT MESSAGES
 ========================= */
 [data-testid="stChatMessage"] {
-    padding: 1.1rem 1.25rem;
-    border-radius: 18px;
-    margin-bottom: 0.9rem;
-    animation: fadeIn 0.2s ease-out;
+    padding: 1.25rem 1.5rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* =========================
    USER MESSAGE
 ========================= */
-[data-testid="stChatMessage"].user {
-    background: linear-gradient(135deg, #ff4b4b, #ff6b6b);
+[data-testid="stChatMessage"][data-testid*="user"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     margin-left: auto;
-    box-shadow: 0 10px 30px rgba(255,75,75,.35);
+    max-width: 85%;
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* =========================
-   ASSISTANT THINKING BUBBLE
+   ASSISTANT MESSAGE
 ========================= */
-.assistant-thinking {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0.6rem 0.9rem;
-    margin-bottom: 0.6rem;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    width: fit-content;
-    font-size: 0.85rem;
-    color: #cfcfcf;
-}
-
-/* Thinking text */
-.thinking-text {
-    opacity: 0.85;
-}
-
-/* Typing dots */
-.dot {
-    width: 6px;
-    height: 6px;
-    background: #7dd3fc;
-    border-radius: 50%;
-    animation: blink 1.4s infinite both;
-}
-
-.dot:nth-child(1) { animation-delay: 0s; }
-.dot:nth-child(2) { animation-delay: .2s; }
-.dot:nth-child(3) { animation-delay: .4s; }
-
-@keyframes blink {
-    0% { opacity: .2; }
-    20% { opacity: 1; }
-    100% { opacity: .2; }
+[data-testid="stChatMessage"][data-testid*="assistant"] {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin-right: auto;
+    max-width: 85%;
 }
 
 /* =========================
-   MODERN LOADING OVERLAY
+   THINKING ANIMATION
+========================= */
+.thinking-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.75rem 1.1rem;
+    border-radius: 16px;
+    background: rgba(102, 126, 234, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    backdrop-filter: blur(10px);
+    margin-bottom: 0.5rem;
+}
+
+.thinking-text {
+    color: #a8a8ff;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.thinking-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.thinking-dot {
+    width: 7px;
+    height: 7px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    animation: bounce 1.4s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(1) { animation-delay: 0s; }
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+/* =========================
+   LOADING OVERLAY
 ========================= */
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at top, #0f141c, #05070b);
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    animation: fadeIn 0.3s ease;
 }
 
 .loading-box {
     text-align: center;
-    color: #e6e6e6;
+    animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .loading-spinner {
-    width: 52px;
-    height: 52px;
-    border: 4px solid rgba(255,255,255,0.12);
-    border-top: 4px solid #7dd3fc;
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid #667eea;
+    border-right: 4px solid #764ba2;
     border-radius: 50%;
-    animation: spin 0.9s linear infinite;
-    margin: 0 auto 1rem auto;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
 }
 
 .loading-text {
-    font-size: 0.95rem;
-    opacity: 0.85;
-    letter-spacing: 0.3px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
 }
 
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
-/* =========================
-   INPUT
-========================= */
-textarea {
-    background: #11151c !important;
-    border-radius: 14px !important;
-    border: 1px solid #2a2f3a !important;
-    color: #e6e6e6 !important;
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* =========================
-   ANIMATION
+   CHAT INPUT
 ========================= */
-@keyframes fadeIn {
+[data-testid="stChatInput"] {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 18px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-testid="stChatInput"] textarea {
+    background: transparent !important;
+    border: none !important;
+    color: #e8e8e8 !important;
+    font-size: 0.95rem !important;
+    padding: 1rem !important;
+}
+
+[data-testid="stChatInput"] textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-testid="stChatInput"] textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Send button */
+[data-testid="stChatInput"] button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-testid="stChatInput"] button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+[data-testid="stSidebar"] {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-testid="stSidebar"] .stMarkdown h1 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+/* File uploader */
+[data-testid="stFileUploader"] {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px dashed rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: rgba(102, 126, 234, 0.6);
+    background: rgba(102, 126, 234, 0.05);
+}
+
+/* =========================
+   INFO BOX
+========================= */
+[data-testid="stInfo"] {
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    color: #b8b8ff;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateY(4px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================
+   MARKDOWN CONTENT
+========================= */
+.stMarkdown p {
+    line-height: 1.7;
+    color: #e8e8e8;
+}
+
+.stMarkdown code {
+    background: rgba(102, 126, 234, 0.15);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    color: #c4c4ff;
+    font-size: 0.9em;
+}
+
+.stMarkdown pre {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+    [data-testid="stChatMessage"] {
+        max-width: 95% !important;
+    }
+    
+    .main .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 }
