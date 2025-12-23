@@ -19,8 +19,10 @@ st.set_page_config(
 )
 
 # ---------------- CSS YÜKLEME ----------------
+
 def load_css():
-    with open("styles/chat.css") as f:
+    # Buraya encoding="utf-8" ekliyoruz
+    with open("styles/chat.css", encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 load_css()
