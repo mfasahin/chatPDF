@@ -16,6 +16,9 @@ def init_session():
     if "rendering" not in st.session_state:
         st.session_state.rendering = False
 
+    # ✅ Sidebar state
+    if "sidebar_open" not in st.session_state:
+        st.session_state.sidebar_open = True
 
 def reset_chat_on_new_pdf(file_id: str):
     """
