@@ -1,5 +1,3 @@
-# session_state yönetimi
-
 import streamlit as st
 from typing import List, Tuple
 
@@ -12,21 +10,34 @@ def init_session():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history: ChatHistory = []
 
-    if "last_pdf_hash" not in st.session_state:
-        st.session_state.last_pdf_hash: str | None = None
+    if "last_pdf_id" not in st.session_state:
+        st.session_state.last_pdf_id: str | None = None
+    
+    if "rendering" not in st.session_state:
+        st.session_state.rendering = False
 
 
-def reset_chat_on_new_pdf(pdf_hash: str):
+def reset_chat_on_new_pdf(file_id: str):
     """
-    Yeni PDF yüklendiğinde sohbet geçmişini sıfırlar ve açılış mesajını ekler
+    Yeni PDF yüklendiğinde sohbet geçmişini sıfırlar ve analiz mesajını ekler
     """
-    if st.session_state.last_pdf_hash != pdf_hash:
-        # Eski yöntem: st.session_state.chat_history.clear()
+    if st.session_state.last_pdf_id != file_id:
+        # Analiz tamamlandı mesajı
+        analysis_msg = """
+Harika! 🎉 PDF dosyanı analiz ettim ve hazırım.
+
+Artık belgenin içeriği hakkında bana istediğin soruları sorabilirsin. Ben sana en doğru cevapları vereceğim! 
+
+Ne öğrenmek istersin? 💬
+        """
         
-        # YENİ YÖNTEM: Listeyi boşaltmak yerine ilk mesajı ekliyoruz
-        # Tuple yapısı: (Rol, Mesaj) -> ("assistant", "Merhaba...")
+        # Chat history'yi tamamen sıfırla
         st.session_state.chat_history = [
-            ("assistant", "PDF dosyanı başarıyla analiz ettim. İçeriğiyle ilgili merak ettiğin her şeyi sorabilirsin.")
+            ("assistant", analysis_msg.strip())
         ]
         
-        st.session_state.last_pdf_hash = pdf_hash
+        # ID'yi güncelle
+        st.session_state.last_pdf_id = file_id
+        
+        # Rendering flag'i sıfırla
+        st.session_state.rendering = False

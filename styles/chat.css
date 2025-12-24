@@ -1,43 +1,52 @@
 /* =========================
-   GLOBAL & FONTS
+   GLOBAL RESET & FONTS
 ========================= */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 * {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* =========================
-   APP BACKGROUND & LAYOUT (DÜZELTİLDİ)
+   BACKGROUND - TAM SAYFA
 ========================= */
-/* Arka planı ana view container'a veriyoruz ki kaydırmada bozulmasın */
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-    background-attachment: fixed;
-    background-size: cover;
+html, body {
+    background: #0f0c29 !important;
+    overflow-x: hidden;
 }
 
-/* Header şeffaflığı */
-[data-testid="stHeader"] {
-    background-color: transparent !important;
+[data-testid="stApp"] {
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%) !important;
+    min-height: 100vh !important;
 }
 
-/* --- KRİTİK DÜZELTME: ALTTAKİ SİYAH ŞERİDİ KALDIRMA --- */
+/* TÜM STREAMLIT CONTAINER'LARINI ŞEFFAFLAŞTIR */
+[data-testid="stAppViewContainer"],
+.main,
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"],
+section[data-testid="stSidebar"] > div:first-child,
 [data-testid="stBottom"] {
-    background-color: transparent !important;
     background: transparent !important;
-    border: none !important;
+    background-color: transparent !important;
 }
 
 /* =========================
-   HIDE STREAMLIT DEFAULTS
+   STREAMLIT GİZLE
 ========================= */
-[data-testid="stStatus"],
+#MainMenu,
+footer,
+header,
 [data-testid="stStatusWidget"],
 .stDeployButton,
-#MainMenu,
-footer {
+div[data-testid="stToolbar"] {
     display: none !important;
+    visibility: hidden !important;
 }
 
 /* =========================
@@ -45,248 +54,327 @@ footer {
 ========================= */
 .main .block-container {
     max-width: 900px;
-    padding-top: 3rem;
-    padding-bottom: 120px; /* Chat input altında yazı kalmasın */
+    padding: 2rem 1rem 140px 1rem !important;
+    margin: 0 auto;
 }
 
 /* =========================
-   HEADER
-========================= */
-h1 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin-bottom: 2rem;
-}
-
-/* =========================
-   CHAT MESSAGES
+   CHAT MESSAGES - MODERN GLASSMORPHISM
 ========================= */
 [data-testid="stChatMessage"] {
-    padding: 1.25rem 1.5rem;
-    border-radius: 20px;
-    margin-bottom: 1rem;
-    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem !important;
+    border-radius: 24px !important;
+    margin-bottom: 1.2rem !important;
+    backdrop-filter: blur(20px) !important;
+    animation: messageSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* User Message */
+/* USER MESSAGE - Gradient Modern */
 [data-testid="stChatMessage"][data-testid*="user"] {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    margin-left: auto;
-    max-width: 85%;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    margin-left: auto !important;
+    max-width: 80% !important;
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4) !important;
 }
 
-/* Assistant Message */
+[data-testid="stChatMessage"][data-testid*="user"] p,
+[data-testid="stChatMessage"][data-testid*="user"] * {
+    color: white !important;
+}
+
+/* ASSISTANT MESSAGE - Glassmorphism */
 [data-testid="stChatMessage"][data-testid*="assistant"] {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    margin-right: auto;
-    max-width: 85%;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    margin-right: auto !important;
+    max-width: 80% !important;
+}
+
+[data-testid="stChatMessage"][data-testid*="assistant"] p,
+[data-testid="stChatMessage"][data-testid*="assistant"] * {
+    color: #e8e8e8 !important;
+}
+
+@keyframes messageSlide {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* =========================
-   THINKING ANIMATION
+   THINKING ANIMATION - MODERN
 ========================= */
 .thinking-container {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 0.75rem 1.1rem;
-    border-radius: 16px;
-    background: rgba(102, 126, 234, 0.08);
-    border: 1px solid rgba(102, 126, 234, 0.15);
+    gap: 12px;
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
     backdrop-filter: blur(10px);
-    margin-bottom: 0.5rem;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
 }
 
 .thinking-text {
-    color: #a8a8ff;
-    font-size: 0.9rem;
+    color: #b8b8ff;
+    font-size: 0.95rem;
     font-weight: 500;
+    letter-spacing: 0.3px;
 }
 
 .thinking-dots {
     display: flex;
-    gap: 4px;
+    gap: 5px;
 }
 
 .thinking-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 50%;
-    animation: bounce 1.4s ease-in-out infinite;
+    animation: dotBounce 1.4s ease-in-out infinite;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
 }
 
 .thinking-dot:nth-child(1) { animation-delay: 0s; }
 .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
 .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-10px); opacity: 1; }
+@keyframes dotBounce {
+    0%, 60%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-12px) scale(1.2);
+        opacity: 1;
+    }
 }
 
 /* =========================
-   LOADING OVERLAY
+   CHAT INPUT - ULTRA MODERN
 ========================= */
-.loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    animation: fadeIn 0.3s ease;
-}
-
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top: 4px solid #667eea;
-    border-right: 4px solid #764ba2;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1.5rem auto;
-}
-
-.loading-text {
-    font-size: 1rem;
-    font-weight: 500;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* =========================
-   CHAT INPUT DESIGN (TAMAMEN YENİLENDİ)
-========================= */
-
-/* 1. Konumlandırma */
+/* Container */
 div[data-testid="stChatInput"] {
-    position: fixed;
-    bottom: 40px !important;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 800px;
-    z-index: 9999;
-    padding-inline: 1rem;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    padding: 20px !important;
+    background: linear-gradient(
+        to top,
+        rgba(15, 12, 41, 0.98) 0%,
+        rgba(15, 12, 41, 0.95) 60%,
+        rgba(15, 12, 41, 0.7) 85%,
+        transparent 100%
+    ) !important;
+    backdrop-filter: blur(10px) !important;
+    transform: none !important;
+    margin: 0 !important;
 }
 
-/* 2. Kapsül Tasarımı (Input Kutusu) */
+/* Input Container - Glassmorphism */
 div[data-testid="stChatInput"] > div {
-    background: rgba(20, 20, 30, 0.85) !important;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50px !important; /* Tam oval kenarlar */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    padding: 5px 8px; /* İç boşluk */
-    align-items: center; /* İçerikleri dikey ortala */
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    background: rgba(30, 30, 45, 0.6) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 28px !important;
+    padding: 8px 12px 8px 20px !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* 3. Focus Efekti */
 div[data-testid="stChatInput"] > div:focus-within {
-    border-color: rgba(124, 77, 255, 0.6);
-    box-shadow: 0 0 25px rgba(124, 77, 255, 0.3);
-    transform: translateY(-2px);
-    transition: all 0.3s ease;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+    box-shadow: 
+        0 12px 48px rgba(102, 126, 234, 0.25),
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-2px) !important;
 }
 
-/* 4. Metin Alanı */
+/* Textarea */
 div[data-testid="stChatInput"] textarea {
-    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
     color: #ffffff !important;
-    font-size: 16px !important;
-    padding: 12px 15px !important;
-    line-height: 1.5;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.6 !important;
+    padding: 12px 0 !important;
+    resize: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 div[data-testid="stChatInput"] textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-    font-style: italic;
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-weight: 400 !important;
 }
 
-/* 5. GÖNDER BUTONU (Send Button) - DÜZELTİLDİ */
+/* Send Button - Ultra Modern */
 div[data-testid="stChatInput"] button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; /* Mor Gradient Arkaplan */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     border: none !important;
-    border-radius: 50% !important; /* Tam yuvarlak */
-    width: 42px !important;  
-    height: 42px !important;
+    border-radius: 50% !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin-right: 5px !important;
-    transition: all 0.3s ease !important;
-    padding: 0 !important; /* Default padding'i sıfırla */
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4) !important;
 }
 
-/* Buton İkonu Rengi */
+div[data-testid="stChatInput"] button:hover {
+    transform: scale(1.08) rotate(5deg) !important;
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.6) !important;
+}
+
+div[data-testid="stChatInput"] button:active {
+    transform: scale(0.95) !important;
+}
+
 div[data-testid="stChatInput"] button svg {
     fill: white !important;
     color: white !important;
-    width: 18px !important;
-    height: 18px !important;
-}
-
-/* Hover Efekti */
-div[data-testid="stChatInput"] button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(118, 75, 162, 0.7);
-}
-
-/* Streamlit'in "Enter to send" ipucunu gizle */
-div[data-testid="stChatInput"] .st-emotion-cache-1ae4f34 {
-    display: none;
+    width: 20px !important;
+    height: 20px !important;
 }
 
 /* =========================
-   SIDEBAR & UPLOAD
+   SIDEBAR - MODERN
 ========================= */
 [data-testid="stSidebar"] {
-    background: rgba(15, 12, 41, 0.6); /* Daha şeffaf */
-    backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(15, 12, 41, 0.7) !important;
+    backdrop-filter: blur(30px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
+[data-testid="stSidebar"] h1 {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* File Uploader - Modern */
 [data-testid="stFileUploader"] {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 2px dashed rgba(102, 126, 234, 0.3);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 2px dashed rgba(102, 126, 234, 0.3) !important;
+    border-radius: 20px !important;
+    padding: 2rem !important;
+    transition: all 0.3s ease !important;
 }
 
 [data-testid="stFileUploader"]:hover {
-    border-color: rgba(102, 126, 234, 0.6);
-    background: rgba(102, 126, 234, 0.05);
+    background: rgba(102, 126, 234, 0.08) !important;
+    border-color: rgba(102, 126, 234, 0.6) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Success/Info Messages */
+[data-testid="stSuccess"] {
+    background: rgba(34, 197, 94, 0.1) !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+    border-radius: 16px !important;
+    color: #86efac !important;
 }
 
 /* =========================
-   SCROLLBAR & RESPONSIVE
+   SCROLLBAR - ELEGANT
 ========================= */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
 
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2, #667eea);
+    background-clip: padding-box;
+}
+
+/* =========================
+   MARKDOWN CONTENT
+========================= */
+.stMarkdown {
+    color: #e8e8e8 !important;
+}
+
+.stMarkdown p {
+    line-height: 1.8 !important;
+    margin-bottom: 1rem !important;
+}
+
+.stMarkdown code {
+    background: rgba(102, 126, 234, 0.15) !important;
+    color: #c4c4ff !important;
+    padding: 0.2em 0.6em !important;
+    border-radius: 8px !important;
+    font-size: 0.9em !important;
+}
+
+.stMarkdown pre {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 768px) {
-    div[data-testid="stChatInput"] { width: 95% !important; bottom: 20px !important; }
-    .main .block-container { padding-left: 1rem; padding-right: 1rem; }
+    .main .block-container {
+        padding: 1.5rem 0.75rem 120px 0.75rem !important;
+    }
+    
+    [data-testid="stChatMessage"] {
+        max-width: 92% !important;
+        padding: 1.2rem !important;
+    }
+    
+    div[data-testid="stChatInput"] {
+        padding: 15px !important;
+    }
+    
+    div[data-testid="stChatInput"] > div {
+        border-radius: 24px !important;
+    }
 }
